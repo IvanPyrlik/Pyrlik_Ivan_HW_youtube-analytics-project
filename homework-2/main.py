@@ -1,4 +1,4 @@
-from src.channel import Channel
+from src.channel import Channel, to_json
 
 if __name__ == '__main__':
     moscowpython = Channel('UC-OVMPlMA3-YCIeg4z5z23A')
@@ -16,5 +16,5 @@ if __name__ == '__main__':
     print(Channel.get_service())
     # <googleapiclient.discovery.Resource object at 0x000002B1E54F9750>
 
-    # создаем файл 'moscowpython.json' в данными по каналу
-    moscowpython.to_json('moscowpython.json')
+    # создаем файл 'moscowpython.json' c данными по каналу
+    to_json('moscowpython.json')
