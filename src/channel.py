@@ -4,21 +4,20 @@ import os
 from googleapiclient.discovery import build
 
 
-def to_json(dict_to_print: dict) -> None:
+def to_json(channel: dict) -> None:
     """Выводит словарь в json-подобном удобном формате с отступами"""
-    print(json.dumps(dict_to_print, indent=2, ensure_ascii=False))
+    print(json.dumps(channel, indent=2, ensure_ascii=False))
 
 
 class Channel:
     """Класс для ютуб-канала"""
-    api_key: str = os.getenv('API_KEY')
-    youtube = build('youtube', 'v3', developerKey=api_key)
+
     channel_id = 'AIzaSyCvIQes6xj93ZEizTMz29Scrt7K8We1Y10'  # HighLoad Channel
 
     def __init__(self, channel_id: str) -> None:
         """Экземпляр инициализируется id канала. Дальше все данные будут подтягиваться по API."""
-        self.channel_id = channel_id
-        self.channel = self.youtube.channels().list(id=channel_id, part='snippet,statistics').execute()
+        self.__channel_id = channel_id
+        self.channel = self.get_service().channels().list(id=channel_id, part='snippet,statistics').execute()
         self.title = self.channel['items'][0]['snippet']['title']
         self.description = self.channel['items'][0]['snippet']['description']
         self.url = f'https://www.youtube.com/channel/{self.channel['items'][0]['id']}'
@@ -26,12 +25,44 @@ class Channel:
         self.video_count = self.channel['items'][0]['statistics']['videoCount']
         self.veiw_count = self.channel['items'][0]['statistics']['viewCount']
 
+    def __str__(self):
+        return f'{self.title}({self.url})'
+
+    def __add__(self, other):
+        return int(self.subscriber_count) + int(other.subscriber_count)
+
+    def __sub__(self, other):
+        return int(self.subscriber_count) - int(other.subscriber_count)
+
+    def __rsub__(self, other):
+        return int(other.subscriber_count) - int(self.subscriber_count)
+
+    def __gt__(self, other):
+        return int(self.subscriber_count) > int(other.subscriber_count)
+
+    def __ge__(self, other):
+        return int(self.subscriber_count) >= int(other.subscriber_count)
+
+    def __lt__(self, other):
+        return int(self.subscriber_count) < int(other.subscriber_count)
+
+    def __le__(self, other):
+        return int(self.subscriber_count) <= int(other.subscriber_count)
+
+    def __eq__(self, other):
+        return int(self.subscriber_count) == int(other.subscriber_count)
+
+
     @classmethod
     def get_service(cls):
         api_key: str = os.getenv('API_KEY')
         youtube = build('youtube', 'v3', developerKey=api_key)
         return youtube
 
+    #@property
+    #def channel_id(self):
+        #return self.__channel_id
+
     def print_info(self) -> None:
         """Выводит в консоль информацию о канале."""
-        to_json(self.channel)
+        print(json.dumps(self.channel, indent=2, ensure_ascii=False))
